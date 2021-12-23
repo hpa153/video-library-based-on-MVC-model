@@ -5,7 +5,10 @@ const { singleObjectConverter } = require("../../util/mongoose");
 class ManageController {
   // [GET] /manage
   index(req, res, next) {
-    Promise.all([Video.find({}), Video.countDocumentsDeleted()])
+    Promise.all([
+      Video.find({}).sortColumn(req), 
+      Video.countDocumentsDeleted()]
+    )
       .then(([videos, deletedVideos]) =>
         res.render('manage', {
           deletedVideos,
