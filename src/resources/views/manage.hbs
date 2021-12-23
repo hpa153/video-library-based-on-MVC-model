@@ -1,0 +1,132 @@
+<form class="mt-4" name="main-form" method="POST" action="./manage/action-handler">
+  <h3>My Videos</h3>
+  <a href="manage/trash">Deleted Videos ({{deletedVideos}})</a>
+
+  <div class="mt-4 d-flex align-items-center">
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" value="" id="select-all">
+      <label class="form-check-label" for="select-all">
+        Select all
+      </label>
+    </div>
+
+    <select class="form-control form-control-sm w-auto mx-4" name="action" required>
+      <option value="">-- Select your action --</option>
+      <option value="delete">Delete</option>
+    </select>
+
+    <button type="submit" id="apply-btn" class="btn btn-info btn-sm" disabled>Apply</button>
+  </div>
+
+  <table class="table mt-2">
+    <thead>
+      <tr>
+        <th scope="col"></th>
+        <th scope="col">#</th>
+        <th scope="col">Name</th>
+        <th scope="col">Description</th>
+        <th scope="col">Created At</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each videos}}
+      <tr>
+        <td>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="videoIds[]" value="{{this._id}}">
+          </div>
+        </td>
+        <td scope="row">{{indexSum @index 1}}</td>
+        <td>{{this.name}}</td>
+        <td>{{this.description}}</td>
+        <td>{{this.createdAt}}</td>
+        <td>
+          <a href="/manage/edit/{{this._id}}" class="btn btn-primary btn-sm">Update</a>
+          <button type="button" class="btn btn-danger btn-sm mt-1" data-toggle="modal" data-target="#deleteModal"
+            data-id="{{this._id}}">Delete</button>
+        </td>
+      </tr>
+      {{else}}
+      <td colspan="5" class="text-center">You don't have any videos, yet!
+        <a href="/manage/add">Add video now</a>
+      </td>
+      {{/each}}
+    </tbody>
+  </table>
+</form>
+
+{{!-- Delete confirmation modal --}}
+
+<div id="deleteModal" class="modal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Delete your video!</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Really delete your video?</p>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-delete" type="button" class="btn btn-danger btn-sm">Delete</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{!-- Hidden delete form --}}
+<form name="delete-form" method="POST"></form>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+
+    let videoId;
+    let deleteForm = document.forms['delete-form'];
+    let deleteBtn = document.getElementById('btn-delete');
+    let checkAllBox = $('#select-all');
+    let applyBtn = $('#apply-btn');
+    let videoCheckboxes = $('input[name="videoIds[]"]');
+
+    // Get video id from clicked button
+    $('#deleteModal').on('show.bs.modal', function (event) {
+      let button = $(event.relatedTarget);
+      videoId = button.data('id');
+    });
+
+    // Delete function
+    deleteBtn.onclick = function () {
+      deleteForm.action = '/manage/' + videoId + '?_method=DELETE';
+      deleteForm.submit();
+    }
+    
+    // Check all checkboxes based on checkall box
+    checkAllBox.change(function () {
+      let allIsChecked = $(this).prop('checked');
+
+      videoCheckboxes.prop('checked', allIsChecked);
+      toggleApplyBtn();
+    })
+
+    // Check checkall button based on checked video checkboxes
+    videoCheckboxes.change(function () {
+      let allChecked = videoCheckboxes.length === $('input[name="videoIds[]"]:checked').length;
+
+      checkAllBox.prop('checked', allChecked);
+      toggleApplyBtn();
+    })
+
+    // Toggle ability of apply button
+    function toggleApplyBtn() {
+      let checkedBoxCounter = $('input[name="videoIds[]"]:checked').length;
+
+      if (checkedBoxCounter > 0) {
+        applyBtn.attr('disabled', false);
+      } else {
+        applyBtn.attr('disabled', true);
+      }
+    }
+  })
+</script>

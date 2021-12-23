@@ -1,0 +1,90 @@
+<div class="mt-4">
+  <h3>Deleted Videos</h3>
+  <a href="/manage">My Videos</a>
+  <table class="table mt-4">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Name</th>
+        <th scope="col">Description</th>
+        <th scope="col">Deleted At</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each videos}}
+      <tr>
+        <th scope="row">{{indexSum @index 1}}</th>
+        <td>{{this.name}}</td>
+        <td>{{this.description}}</td>
+        <td>{{this.deletedAt}}</td>
+        <td>
+          <a href="" class="btn btn-primary btn-sm restore-btn" data-id="{{this._id}}">Restore</a>
+          <button type="button" class="btn btn-danger btn-sm mt-1" data-toggle="modal" data-target="#deleteModal"
+            data-id="{{this._id}}">Delete</button>
+        </td>
+      </tr>
+      {{else}}
+        <td colspan="5" class="text-center">You don't have any deleted videos! 
+          <a href="/manage">View my videos</a>
+        </td>
+      {{/each}}
+    </tbody>
+  </table>
+</div>
+
+{{!-- Delete confirmation modal --}}
+
+<div id="deleteModal" class="modal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Permanent delete!</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>This action is irreversible. Really delete your video?</p>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-delete" type="button" class="btn btn-danger btn-sm">Delete</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{!-- Hidden forms --}}
+<form name="delete-form" method="POST"></form>
+<form name="restore-form" method="POST"></form>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+
+    let videoId;
+    let deleteForm = document.forms['delete-form'];
+    let restoreForm = document.forms['restore-form'];
+    let deleteBtn = document.getElementById("btn-delete");
+    let restoreBtn = $('.restore-btn');
+    console.log(restoreBtn);
+
+    $('#deleteModal').on('show.bs.modal', function (event) {
+      let button = $(event.relatedTarget);
+      videoId = button.data('id');
+    });
+
+    // Delete function
+    deleteBtn.onclick = function () {
+      deleteForm.action = '/manage/delete/'+ videoId + '?_method=DELETE';
+      deleteForm.submit();
+    }
+
+    // Restore function
+    restoreBtn.click(function (e) {
+      e.preventDefault();
+      videoId = $(this).data('id');
+      restoreForm.action = '/manage/restore/'+ videoId + '?_method=PATCH';
+      restoreForm.submit();
+    });
+  })
+</script>

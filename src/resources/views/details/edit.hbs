@@ -1,0 +1,18 @@
+<div class="mt-4">
+  <h3>Edit your video</h3>
+  <form class="mt-4" method="POST" action="/manage/{{video._id}}?_method=PUT">
+    <div class="mb-3">
+      <label for="name" class="form-label">Name:</label>
+      <input type="text" class="form-control" id="name" name="name" value="{{video.name}}">
+    </div>
+    <div class="mb-3">
+      <label for="description" class="form-label">Description:</label>
+      <textarea class="form-control" id="description" name="description">{{video.description}}</textarea>
+    </div>
+    <div class="mb-3">
+      <label for="videoId" class="form-label">Video ID:</label>
+      <input type="text" class="form-control" id="videoId" name="videoId" value="{{video.videoId}}">
+    </div>
+    <button type="submit" class="btn btn-primary btn-sm">Update!</button>
+  </form>
+</div>
