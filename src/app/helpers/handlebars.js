@@ -12,7 +12,7 @@ module.exports = {
       };
 
       const types = {
-          default: 'asc',
+          default: 'desc',
           asc: 'desc',
           desc: 'asc',
       };
